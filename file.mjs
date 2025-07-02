@@ -11,3 +11,10 @@ import {
 await writeFile("./data.txt", "apple");
 let contents = await readFile("./data.txt", { encoding: "utf8" });
 console.log(contents);
+
+// add content in existing file ..........
+
+await appendFile("./data.txt", " banana");
+
+contents = await readFile("./data.txt", { encoding: "utf8" });
+console.log(contents);
