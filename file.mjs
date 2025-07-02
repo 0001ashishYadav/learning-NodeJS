@@ -26,3 +26,11 @@ console.log(contents);
 // make folder
 
 await mkdir("./makeFile", { recursive: true });
+
+// make multiple files in single folder using for loop
+
+const fileName = ["apple", "banana", "orange", "mango", "coconut"];
+
+for (let i = 0; i < fileName.length; i++) {
+  await writeFile(`./makeFile/${fileName[i]}.txt`, `${fileName[i]}`);
+}
