@@ -21,4 +21,8 @@ console.log(contents);
 
 // delet file
 
-await unlink("./file.txt");
+// await unlink("./file.txt");
+
+// make folder
+
+await mkdir("./makeFile", { recursive: true });
