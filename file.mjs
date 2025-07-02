@@ -18,3 +18,7 @@ await appendFile("./data.txt", " banana");
 
 contents = await readFile("./data.txt", { encoding: "utf8" });
 console.log(contents);
+
+// delet file
+
+await unlink("./file.txt");
