@@ -1,0 +1,31 @@
+{
+  "name": "server",
+  "version": "0.1.0",
+  "description": "server",
+  "keywords": [
+    "server"
+  ],
+  "homepage": "https://github.com/0001ashishYadav/learning-NodeJS#readme",
+  "bugs": {
+    "url": "https://github.com/0001ashishYadav/learning-NodeJS/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0001ashishYadav/learning-NodeJS.git"
+  },
+  "license": "ISC",
+  "author": "Ashish Yadav",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
