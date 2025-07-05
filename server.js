@@ -5,6 +5,18 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+app.get("/apple", (req, res) => {
+  res.send("apple");
+});
+
+app.post("/files", (req, res) => {
+  console.log(req.query.name);
+  // console.log(req.body);
+  res.json({
+    data: "files",
+  });
+});
+
 app.all(/^.*$/, (req, res) => {
   res.json({
     message: "wrong route",
