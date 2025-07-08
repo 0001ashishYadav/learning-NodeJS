@@ -16,10 +16,10 @@
   "license": "ISC",
   "author": "Ashish Yadav",
   "type": "commonjs",
-  "main": "server.js",
+  "main": "server.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
+    "start": "node server.mjs",
     "dev": "nodemon"
   },
   "dependencies": {
