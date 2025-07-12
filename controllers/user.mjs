@@ -1,5 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
 
+import jwt from "jsonwebtoken";
+
 const registerController = async (req, res, next) => {
   // input check
   if (!req.body.name || !req.body.email || !req.body.password) {
@@ -72,7 +74,7 @@ const loginController = async (req, res, next) => {
 
   const token = jwt.sign(
     { name: user.name, email: user.email },
-    "kuguogyfyfvhgyvhuofkygvkiulju",
+    process.env.TOKEN_SECRET,
     { expiresIn: "1h" }
   );
 
