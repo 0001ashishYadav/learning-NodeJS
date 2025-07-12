@@ -23,12 +23,14 @@
 // });
 
 import express from "express";
+import "dotenv/config";
+
 import { registerController, loginController } from "./controllers/user.mjs";
 import { prizeController } from "./controllers/prize.mjs";
 import { globalMiddleware, authMiddleware } from "./middleware.mjs";
 import { errorController, undefinedRouteHandler } from "./error.mjs";
 const server = express();
-const port = 5000;
+const port = process.env.PORT || 8000;
 
 server.use(express.json());
 
