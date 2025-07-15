@@ -1,6 +1,0 @@
-{
-  "users": [
-    { "name": "apple", "email": "a@a.com", "password": "1234" },
-    { "name": "apple", "email": "a@a.gmail.com", "password": "123456" }
-  ]
-}
