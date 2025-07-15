@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 
 import prisma from "../db.mjs";
 
+import bcrypt from "bcrypt";
+
 const registerController = async (req, res, next) => {
   // input check
   if (!req.body.name || !req.body.email || !req.body.password) {
@@ -12,11 +14,16 @@ const registerController = async (req, res, next) => {
     // throw new Error(JSON.stringify({ error: "input is not valid" }))
   }
 
+  // hash password of user
+  const newHashedPassword = await bcrypt.hash(req.body.password, 10);
+
+  // add user in DB
+
   await prisma.user.create({
     data: {
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password,
+      password: newHashedPassword,
     },
   });
 
@@ -43,7 +50,9 @@ const loginController = async (req, res, next) => {
   }
 
   // match password
-  if (user.password !== req.body.password) {
+
+  const isOk = await bcrypt.compare(req.body.password, user.password);
+  if (!isOk) {
     res.statusCode = 400;
     return res.json({ error: "password is wrong" });
   }
