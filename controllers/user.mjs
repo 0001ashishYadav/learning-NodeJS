@@ -6,12 +6,29 @@ import prisma from "../db.mjs";
 
 import bcrypt from "bcrypt";
 
+import * as z from "zod";
+
+// input model for user registration
+const UserModel = z.object({
+  name: z
+    .string()
+    .trim()
+    .regex(/^[a-zA-Z0-9\s]*$/, "Name cannot contain special characters"),
+  email: z.email({ message: "Invalid email" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" }),
+});
+
 const registerController = async (req, res, next) => {
   // input check
-  if (!req.body.name || !req.body.email || !req.body.password) {
+  try {
+    await UserModel.parseAsync(req.body);
+  } catch (e) {
     res.statusCode = 400;
-    return res.json({ error: "input is not valid" });
-    // throw new Error(JSON.stringify({ error: "input is not valid" }))
+
+    const msg = z.prettifyError(e);
+    return res.json({ error: msg });
   }
 
   // hash password of user
@@ -31,11 +48,22 @@ const registerController = async (req, res, next) => {
   res.json({ message: "register successful" });
 };
 
+// input model for user login
+const UserLoginModel = z.object({
+  email: z.email({ message: "Invalid email" }),
+  password: z
+    .string()
+    .min(4, { message: "Password must be at least 8 characters long" }),
+});
+
 const loginController = async (req, res, next) => {
+  const result = await UserLoginModel.safeParseAsync(req.body);
+
   // validate input
-  if (!req.body.email || !req.body.password) {
+  if (!result.success) {
     res.statusCode = 400;
-    return res.json({ error: "input is not valid" });
+    const msg = z.prettifyError(result.error);
+    return res.json({ error: msg });
   }
 
   // find user in DB
@@ -44,6 +72,7 @@ const loginController = async (req, res, next) => {
       email: req.body.email,
     },
   });
+
   if (!user) {
     res.statusCode = 404;
     return res.json({ error: "user DNE" });
