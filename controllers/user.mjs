@@ -1,14 +1,10 @@
 import { readFile, writeFile } from "fs/promises";
-
 import jwt from "jsonwebtoken";
-
 import prisma from "../db.mjs";
-
 import bcrypt from "bcrypt";
-
 import * as z from "zod";
-
 import { sendEmail } from "../email.mjs";
+import Randomstring from "randomstring";
 
 // input model for user registration
 const UserModel = z.object({
@@ -100,10 +96,32 @@ const loginController = async (req, res, next) => {
 const forgotPasswordController = async (req, res, next) => {
   // TODO: check for user in DB
 
-  const x = await sendEmail(req.body.email, "test", "<h3>Banana</h3>");
+  const user = await prisma.user.findUnique({
+    where: {
+      email: req.body.email,
+    },
+  });
+
+  if (!user) {
+    res.statusCode = 404;
+    return res.json({ error: "user DNE" });
+  }
+
+  const token = Randomstring.generate();
+  await prisma.user.update({
+    where: { email: req.body.email },
+    data: {
+      resetToken: token,
+      resetTokenExpiry: new Date(Date.now()),
+    },
+  });
+
+  const msg = `<html><body>Click this link <a href="http://localhost:3000/reset_password/${token}">Click Here</a></body></html>`;
+
+  const x = await sendEmail(req.body.email, "Forgot Password", msg);
   console.log(x);
 
-  res.json({ message: "email sent" });
+  res.json({ message: "email sent check your email" });
 };
 
 export { registerController, loginController, forgotPasswordController };
