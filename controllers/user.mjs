@@ -6,6 +6,8 @@ import * as z from "zod";
 import { sendEmail } from "../email.mjs";
 import Randomstring from "randomstring";
 import dayjs from "dayjs";
+import { th } from "zod/v4/locales";
+import { serverError } from "../error.mjs";
 
 // input model for user registration
 const UserModel = z.object({
@@ -24,10 +26,8 @@ const registerController = async (req, res, next) => {
   try {
     await UserModel.parseAsync(req.body);
   } catch (e) {
-    res.statusCode = 400;
-
     const msg = z.prettifyError(e);
-    return res.json({ error: msg });
+    throw new serverError(400, msg);
   }
 
   // hash password of user
@@ -60,9 +60,9 @@ const loginController = async (req, res, next) => {
 
   // validate input
   if (!result.success) {
-    res.statusCode = 400;
     const msg = z.prettifyError(result.error);
-    return res.json({ error: msg });
+
+    throw new serverError(400, msg);
   }
 
   // find user in DB
@@ -73,16 +73,14 @@ const loginController = async (req, res, next) => {
   });
 
   if (!user) {
-    res.statusCode = 404;
-    return res.json({ error: "user DNE" });
+    throw new serverError(404, "user DNE");
   }
 
   // match password
 
   const isOk = await bcrypt.compare(req.body.password, user.password);
   if (!isOk) {
-    res.statusCode = 400;
-    return res.json({ error: "password is wrong" });
+    throw new serverError(400, "password is wrong");
   }
 
   const token = jwt.sign(
@@ -104,8 +102,7 @@ const forgotPasswordController = async (req, res, next) => {
   });
 
   if (!user) {
-    res.statusCode = 404;
-    return res.json({ error: "user DNE" });
+    throw new serverError(404, "user DNE");
   }
 
   const token = Randomstring.generate();
@@ -133,8 +130,7 @@ const resetPasswordController = async (req, res, next) => {
   });
 
   if (!users.length) {
-    res.statusCode = 404;
-    return res.json({ message: "invalid reset link" });
+    throw new serverError(400, "invalid reset link");
   }
 
   const user = users[0];
@@ -144,10 +140,7 @@ const resetPasswordController = async (req, res, next) => {
     "minute"
   );
   if (dayjs(subTime).isAfter(dayjs(user.resetTokenExpiry))) {
-    res.statusCode = 400;
-    return res.json({
-      message: "link is expired!!! try forgot password again",
-    });
+    throw new serverError(400, "link is expired!!! try forgot password again");
   }
 
   const hasedPassword = await bcrypt.hash(req.body.password, 10);
