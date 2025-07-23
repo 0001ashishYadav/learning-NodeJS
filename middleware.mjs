@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { serverError } from "./error.mjs";
 
 const globalMiddleware = (req, res, next) => {
   req.name = "apple";
@@ -25,7 +26,25 @@ const authMiddleware = (req, res, next) => {
   } catch (e) {
     throw new serverError(400, e.message);
   }
+
+  req.user = jwt.decode(token);
+
+  console.log(req.user);
+
   next();
 };
 
-export { globalMiddleware, authMiddleware };
+const permissionMiddleware = (...roles) => {
+  return async (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      throw new serverError(500, "authentication not added correctly");
+    }
+    const role = roles.filter((e) => e === req.user.role);
+    if (role.length == 0) {
+      throw new serverError(401, "you are not authorized!!!");
+    }
+    next();
+  };
+};
+
+export { globalMiddleware, authMiddleware, permissionMiddleware };
